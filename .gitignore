@@ -4,5 +4,4 @@ __pycache__/
 .venv/
 env/
 chroma_db/
-data/processed/*
-!data/processed/.gitkeep
+.DS_Store

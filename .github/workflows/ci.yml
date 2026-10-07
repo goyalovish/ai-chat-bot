@@ -19,17 +19,20 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Linting & Test Tools
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest
+          pip install pdfplumber pypdf flake8
 
       - name: Verify Code Syntax
         run: |
-          # Stop the build if there are Python syntax errors or undefined names
+          # Stop build on syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
-      - name: Verify Ingestion Data Output
+      - name: Run Ingestion Pipeline
         run: |
-          python -c "import json, os; assert os.path.exists('data/processed/chunks.json'), 'chunks.json exists'; data = json.load(open('data/processed/chunks.json')); assert len(data) > 0, 'Chunks populated'"
-          echo "Data ingestion pipeline verified successfully!"
+          python ingestion/run_ingest.py
+
+      - name: Verify Processed Chunks
+        run: |
+          python -c "import json, os; assert os.path.exists('data/processed/chunks.json'); data = json.load(open('data/processed/chunks.json')); assert len(data) > 0; print(f'Successfully verified {len(data)} chunks!')"
